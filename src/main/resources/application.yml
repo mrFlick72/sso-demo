@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: sso
+
+  security:
+    oauth2:
+      client:
+        registration:
+          client:
+            client-id: client
+            client-secret: secret
+            client-name: OnlyOne Portal
+            provider: vauthenticator
+            scope:
+              - openid
+              - profile
+              - email
+            redirect-uri: http://sso-demo.com/app/login/oauth2/code/client
+            client-authentication-method: basic
+            authorization-grant-type: authorization_code
+        provider:
+          vauthenticator:
+            configuration-metadata:
+              end_session_endpoint: ${vauthenticator.host}/vauthenticator/session-logoff
+            authorization-uri: ${vauthenticator.host}/vauthenticator/oauth2/authorize
+            token-uri: ${vauthenticator.host}/vauthenticator/oauth2/token
+            user-info-uri: ${vauthenticator.host}/vauthenticator/userinfo
+            user-info-authentication-method: header
+            jwk-set-uri: ${vauthenticator.host}/vauthenticator/oauth2/jwks
+            user-name-attribute: email
+
+vauthenticator:
+  host: http://sso-demo.com
+  session-management:
+    enabled: true
+    rp-iframe:
+      polling-rate: 30s
+      origin: http://sso-demo.com
+      logout-uri: /app/oidc_logout.html
+
+
+endSessionWithoutDiscovery: true
+oidcEndSessionUrl: http://sso-demo.com/vauthenticator/oidc/logout
+postLogoutRedirectUri:  http://sso-demo.com/app/index.html
+
+server:
+  forward-headers-strategy: framework
+  port: 9090
+  servlet:
+    context-path: /app
